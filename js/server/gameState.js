@@ -11,7 +11,10 @@ module.exports = {
             endState: function() {},
             betRequest: function() {},
             addPlayer: function(board, requestData) {
-                return board.addPlayer(requestData["clientID"], requestData["requestedPosition"]);
+                var i =  board.addPlayer(requestData["clientID"], requestData["requestedPosition"]);
+                console.log("waitingForPlayer.addPlayer:",i)
+
+                return i
             },
             splitRequest: function() {},
             hitRequest: function() {},
@@ -20,7 +23,7 @@ module.exports = {
             insuranceRequest: function() {},
             hideDealerCard: 1,
             message: "Waiting for players to join.",
-            wait: 0 //3000 
+            wait: 0//3000 
         },
         acceptingBets: {
             dropPlayersTimer: "0",
@@ -41,16 +44,12 @@ module.exports = {
             },
             betRequest: function(requestData) {
                 if(board.betRequest(requestData["clientID"], requestData["betAmt"])) {
-                    console.log("Player Timeout Stopped: " + clearTimeout(gameState.currentState.dropPlayersTimer));
+                    console.warn("betRequest Player Timeout Stopped: " + clearTimeout(gameState.currentState.dropPlayersTimer));
                     return 1;
                 }
             },
             addPlayer: function(board, requestData) {
-                    var addPlayerSuccess = board.addPlayer(requestData["clientID"], requestData["requestedPosition"]);
-                    if(addPlayerSuccess && !gameLoop.running) {
-                        console.log("Player Timeout Stopped: " + clearTimeout(gameState.currentState.dropPlayersTimer));
-                    }
-                    return addPlayerSuccess;
+  
                 
             },
             splitRequest: function() {},
@@ -82,9 +81,7 @@ module.exports = {
             hitRequest: function() {},
             standRequest: function() {},
             doubleDownRequest: function() {},
-            insuranceRequest: function() {
-
-            },
+            insuranceRequest: function() { },
             hideDealerCard: 1,
             message: "Dealing",
             wait: 1000 //4000
@@ -95,7 +92,7 @@ module.exports = {
             playerOptionTimeout: function() {
 
                 if(gameLogic.checkPlayerNeedInsurance()) {
-                        console.warn('Delaer has Ace, Players can buy Insurance  ');
+                    
                     if(board.nextPlayerOption()) {
                         console.log("playertimeouthasbeencalled");
                         gameState.currentState.playerOptionTimer = setTimeout(gameState.currentState.playerOptionTimeout, 10000);
@@ -105,18 +102,22 @@ module.exports = {
                     }
                     gameLoop.io.sockets.emit('updateTable', boardOutput.getBoard());
                 } else {
-                    console.warn('no ace for dealer');
+                    
                 }
             },
 
 
             beginState: function() {
+
+               // gameLoop.pauseLoop();
+               // board.setFirstPlayer();                 
                 if(gameLogic.checkPlayerNeedInsurance()) {
                     gameLoop.pauseLoop();
                     board.setFirstPlayer();
                     gameState.currentState.playerOptionTimer = setTimeout(gameState.currentState.playerOptionTimeout, 10000); //call default player action
                     gameLoop.sendTimerUpdate(board.activePlayer,10000);
                 }
+
             },
             endState: function() {
                  gameLoop.sendClearTimersUpdate();
@@ -127,7 +128,27 @@ module.exports = {
             hitRequest: function() {},
             standRequest: function() {},
             doubleDownRequest: function() {},
-            insuranceRequest: function() {
+            insuranceRequest: function(requestData) {
+                
+                    var insuranceSuccess = board.insuranceRequest(requestData["clientID"]);
+                    console.warn("insuranceSuccess:",insuranceSuccess)
+                    
+                    if(insuranceSuccess) {
+                        if(board.nextPlayerOption()) {
+                            clearTimeout(gameState.currentState.playerOptionTimer);
+                            gameState.currentState.playerOptionTimer = setTimeout(gameState.currentState.playerOptionTimeout, 10000);
+                            gameLoop.sendTimerUpdate(board.activePlayer,10000);
+                        } else {
+                            clearTimeout(gameState.currentState.playerOptionTimer);
+                            gameLoop.unPauseLoop();
+                        }                   
+
+                    }
+
+                    return insuranceSuccess;      
+
+
+
 
 
             },
@@ -135,62 +156,13 @@ module.exports = {
             message: "checking For Player Need Insurance",
             wait: 1000 //4000
         },
-        checkingForDealerBlackJack: {
-            beginState: function() {
-                board.incrementSitoutCounter();
-                board.dealCards(deck);
-            },
-            endState: function() {
-                if(gameLogic.checkDealerBlackjack()) {
-                    console.log('Dealer has blackjack. Ending round early.');
-                    gameLoop.concludeRound();
-                } else {
-                    console.log('No Dealer BlackJack.');
-                }},
-            betRequest: function() {},
-            addPlayer: function() {},
-            splitRequest: function() {},
-            hitRequest: function() {},
-            standRequest: function() {},
-            doubleDownRequest: function() {},
-            insuranceRequest: function() {},
-            hideDealerCard: 1,
-            message: "Checking for dealer blackjack.",
-            wait: 1000 //4000
-        },
-        checkingForPlayerBlackJack: {
-            beginState: function() { 
-               // gameLoop.pauseLoop();
-               // board.setFirstPlayer();
-               // gameState.currentState.playerOptionTimer = setTimeout(gameState.currentState.playerOptionTimeout, 10000); //call default player action
-                //gameLoop.sendTimerUpdate(board.activePlayer,10000);                
-            },
-            endState: function() {
-                /*
-                if(gameLogic.checkPlayerBlackjack()) {
-                    console.log('Player has blackjack. Ending round early.');
-                    gameLoop.concludeRound();
-                } else {
-                    console.log('No Player BlackJack.');
-                }
-                */
-            },
-            betRequest: function() {},
-            addPlayer: function() {},
-            splitRequest: function() {},
-            hitRequest: function() {},
-            standRequest: function() {},
-            doubleDownRequest: function() {},
-            insuranceRequest: function() {},
-            hideDealerCard: 1,
-            message: "Checking for player blackjack.",
-            wait: 3000 //4000
-        },
+        
 
         acceptingPlayerOptions: {
             playerOptionTimer: "0",
             playerOptionTimeout: function() {
-                 console.warn("active player:",board.activePlayer);
+                 
+      
                 if(board.nextPlayerOption()) {
                    
                     gameState.currentState.playerOptionTimer = setTimeout(gameState.currentState.playerOptionTimeout, 10000);
@@ -201,10 +173,20 @@ module.exports = {
                 gameLoop.io.sockets.emit('updateTable', boardOutput.getBoard());
             },
             beginState: function() {
+                
+                
+
                 gameLoop.pauseLoop();
-                board.setFirstPlayer();
-                gameState.currentState.playerOptionTimer = setTimeout(gameState.currentState.playerOptionTimeout, 10000); //call default player action
-                gameLoop.sendTimerUpdate(board.activePlayer,10000);
+                board.setFirstPlayer();                 
+                if (gameLogic.handValue(board.getActiveHand()) === 21){
+                    console.warn("checkingForPlayerBlackJack",board.getActiveHand(),gameLogic.handValue(board.getActiveHand()))
+                    gameState.currentState.playerOptionTimer = setTimeout(gameState.currentState.playerOptionTimeout, 0); //call default player action
+                    gameLoop.sendTimerUpdate(board.activePlayer,0);   
+                } else {
+                    gameState.currentState.playerOptionTimer = setTimeout(gameState.currentState.playerOptionTimeout, 10000); //call default player action
+                    gameLoop.sendTimerUpdate(board.activePlayer,10000);                    
+                }
+
             },
             endState: function() {
                 gameLoop.sendClearTimersUpdate();
@@ -289,7 +271,7 @@ module.exports = {
                 board.resetCounters();
                 if(board.playersWaitingForDealer()) {
                 gameLoop.pauseLoop();
-                console.info("Players waiting for dealer: " + board.playersWaitingForDealer());
+                console.warn("Players waiting for dealer: " + board.playersWaitingForDealer());
                 gameLoop.io.sockets.emit('updateTable', boardOutput.getBoard());
                 gameState.stateTimer = setTimeout(gameState.currentState.dealerOptionTimeout, 2000); //call default player action
                 }
@@ -301,7 +283,7 @@ module.exports = {
                     board.cardCountValue=0;
                     gameState.states.concludingRound.message += " Dealer reshuffling " + deck.numberOfDecks + " decks.";
                 } else {
-                    console.log("use same deck, no need to shuffle")
+                    console.warn("use same deck, no need to shuffle")
                 }
             },
             betRequest: function() {},
@@ -320,6 +302,7 @@ module.exports = {
             endState: function() {
                 board.countCards();
                 gameLogic.payOutWinners();
+                //console.log('concludingRound',board)
                 board.resetBoard();
                 if(board.numPlayers === 0) {
                     gameLoop.pauseLoop();

@@ -5,7 +5,7 @@
 module.exports = {
     running: 0,
     //loopOrder: ["waitingForPlayer", "acceptingBets","checkingForDealerBlackJack", "acceptingPlayerOptions", "drawingForDealer", "concludingRound"],
-    loopOrder: ["waitingForPlayer", "acceptingBets","dealingFirstTwoCards","checkingForPlayerBlackJack","checkingForPlayerNeedInsurance" , "acceptingPlayerOptions", "drawingForDealer", "concludingRound"],
+    loopOrder: ["waitingForPlayer", "acceptingBets","dealingFirstTwoCards","checkingForPlayerNeedInsurance" , "acceptingPlayerOptions", "drawingForDealer", "concludingRound"],
     loopIndex: 0,
     startLoop: function(ioInput) {
         this.io = ioInput;

@@ -10,7 +10,7 @@ module.exports = {
     activePlayer: 1,
     activeHand: 0,
     playerBets: [0, 0, 0, 0, 0, 0, 0],
-    playerInsurance: [0, 0, 0, 0, 0, 0, 0],
+    playerInsurances: [0, 0, 0, 0, 0, 0, 0],
     playerCards : [[[]],[[]],[[]],[[]],[[]],[[]],[[]]],
     playerChips: [0, 0, 0, 0, 0, 0, 0],
     playerSitoutCounter: [0, 0, 0, 0, 0, 0, 0],
@@ -47,12 +47,13 @@ module.exports = {
             }
         }
         return 0;
+
     },
     placeInsurance: function(id, insuranceAmt) {
         var playerPosition = this.getPlayerIndex(id);
         if(insuranceAmt <= this.playerChips[playerPosition]) {
             this.playerSitoutCounter[playerPosition] = 0;
-            this.playerInsurance[playerPosition] += insuranceAmt;
+            this.playerInsurances[playerPosition] += insuranceAmt;
             this.playerChips[playerPosition] -= insuranceAmt;
             return 1;
         }
@@ -61,11 +62,15 @@ module.exports = {
 
 
     addPlayer: function(id, requestedPosition) {
+        console.log("addPlayer (this.getPlayerIndex(id)",this.getPlayerIndex(id))
         if(this.getPlayerIndex(id) >= 0) {
             this.remPlayer(id);
         } //Remove player if already seated.
+         console.log("this.tablePositions[requestedPosition],id",this.tablePositions[requestedPosition], id )
+      
         if(this.tablePositions[requestedPosition] === 0 && id !== -1) //Add Player if Empty Seat Exists.
         {
+
             this.positionClientID[requestedPosition] = id;
             this.tablePositions[requestedPosition] = 1;
             this.playerChips[requestedPosition] = this.initialChips;
@@ -103,6 +108,7 @@ module.exports = {
     resetBoard: function() {
         this.removeTimedOutPlayers();
         this.playerBets = [0, 0, 0, 0, 0, 0, 0];
+        this.playerInsurances=[0, 0, 0, 0, 0, 0, 0];
         this.playerCards = [[[]],[[]],[[]],[[]],[[]],[[]],[[]]];
         this.playerWaitingForDeal = 0;
         //this.resetCounters();
@@ -221,6 +227,8 @@ module.exports = {
         }
         return 0;
     },
+
+
     drawDealerCard: function() {
         this.playerCards[0][0].push(deck.randomizedDeck.pop());
     },

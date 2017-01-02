@@ -1,16 +1,27 @@
 module.exports = {
     payOutWinners: function() {
+        console.log("payOutWinners" + board);
         var dealerHandValue = this.handValue(board.playerCards[0][0]);
         console.log("Dealer has " + dealerHandValue);
+
         for(var playerIndex = 1; playerIndex < 7; playerIndex++) {
             if(board.tablePositions[playerIndex] === 1) {
                 for(var handIndex = 0; handIndex < board.playerCards[playerIndex].length; handIndex++) {
                     var currentHand = board.playerCards[playerIndex][handIndex];
                     if((this.handValue(currentHand) > dealerHandValue && this.handValue(currentHand) <= 21) || (this.handValue(currentHand) <= 21 && dealerHandValue > 21)) {
-                        board.playerChips[playerIndex] += 2 * board.playerBets[playerIndex];
+                        board.playerChips[playerIndex] += 2 * board.playerBets[playerIndex]; //win了
                     } else if(this.handValue(currentHand) === dealerHandValue) {
-                        board.playerChips[playerIndex] += board.playerBets[playerIndex];
+                        board.playerChips[playerIndex] += board.playerBets[playerIndex];// 平手
                     }
+                    /*
+                    if(board.playerInsurances[playerIndex] > 0 ) {
+                          board.playerChips[playerIndex] -= board.playerInsurances[playerIndex];// 
+                    }
+                    */
+                    if(board.playerInsurances[playerIndex] > 0 && this.checkPlayerNeedInsurance() ){
+                          board.playerChips[playerIndex] += 3 * board.playerInsurances[playerIndex];// 保险
+                    }
+
                 }
             }
         }
@@ -22,16 +33,18 @@ module.exports = {
         //console.log("dealerHandFirstCard",dealerHandFirstCard[0])
         return(this.handValue(dealerHand) === 21);
     },
-    checkPlayerBlackjack: function() {
-        console.log(board.playerCards)
-        var playerHand = board.playerCards[4][0];
+    checkPlayerBlackjack: function(playerIndex) {
+        
+        var playerHand = board.playerCards[playerIndex][0];
 
 
-        console.warn("checkPlayerBlackjack dealerHand",playerHand)
+        console.warn("checkPlayerBlackjack playerHand",playerHand)
      
-        console.log("checkPlayerBlackjack ",this.handValue(playerHand))
+
         return(this.handValue(playerHand) === 21);
-    },    
+    },  
+
+
     checkPlayerNeedInsurance: function() {
         var dealerHand = board.playerCards[0][0];
         var dealerHandFirstCard = dealerHand[0]

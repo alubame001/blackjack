@@ -70,8 +70,8 @@ module.exports = {
         this.fillDeck();
         this.randomizeDeck();
         if (this.simulate){
-           // this.setDealerGetAce();
-            this.setPlayerGet21();
+            this.setDealerGetAce();
+          //  this.setPlayerGet21();
         }
     },
     shuffleRequired: function() {

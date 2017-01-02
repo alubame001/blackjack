@@ -29,7 +29,7 @@ function Room (io,option) {
     });
 
     socket.on('addPlayerRequest', function(data) {
-        console.info("addPlayerRequest",data)
+        console.info("socket.on addPlayerRequest",data)
         if(gameState.currentState.addPlayer(board, data)) {
             if(!gameLoop.running) {
                 gameLoop.startLoop(io);
@@ -41,42 +41,36 @@ function Room (io,option) {
     });
 
     socket.on('splitRequest', function(data) {
-       console.info("splitRequest",data)
+       console.info("socket.on splitRequest",data)
         if(gameState.currentState.splitRequest(data)) {
             io.sockets.emit('updateTable', boardOutput.getBoard());
         }
     });
 
     socket.on('hitRequest', function(data) {
-             console.info("hitRequest",data)
+             console.info("socket.on  hitRequest",data)
         if(gameState.currentState.hitRequest(data)) {
             io.sockets.emit('updateTable', boardOutput.getBoard());
         }
     });
 
     socket.on('standRequest', function(data) {
-      console.info("standRequest",data)
+      console.info("socket.on standRequest",data)
         if(gameState.currentState.standRequest(data)) {
             io.sockets.emit('updateTable', boardOutput.getBoard());
         }
     });
 
     socket.on('doubleDownRequest', function(data) {
-          console.info("doubleDownRequest",data)
+          console.info("socket.on doubleDownRequest",data)
         if(gameState.currentState.doubleDownRequest(data)) {
             io.sockets.emit('updateTable', boardOutput.getBoard());
         }
     });
 
     socket.on('insuranceRequest', function(data) {
+        console.info("socket.on  insuranceRequest",data)
         if(gameState.currentState.insuranceRequest(data)) {
-            /*
-            if(!gameLoop.running) { //Handles the case that game has been paused.
-                gameLoop.startLoop(io);
-                var clientInfo = getClientInfo(socket.id);
-                socket.emit('clientInfoUpdate', clientInfo);
-            }
-            */
             io.sockets.emit('updateTable', boardOutput.getBoard());
         }
 
@@ -84,6 +78,7 @@ function Room (io,option) {
 
 
     socket.on('betRequest', function(data) {
+       console.info("socket.on  betRequest",data)
         if(gameState.currentState.betRequest(data)) {
             if(!gameLoop.running) { //Handles the case that game has been paused.
                 gameLoop.startLoop(io);
