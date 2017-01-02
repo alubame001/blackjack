@@ -20,7 +20,7 @@ module.exports = {
             insuranceRequest: function() {},
             hideDealerCard: 1,
             message: "Waiting for players to join.",
-            wait: 3000 //3000 
+            wait: 0 //3000 
         },
         acceptingBets: {
             dropPlayersTimer: "0",
@@ -60,7 +60,7 @@ module.exports = {
             insuranceRequest: function() {},
             hideDealerCard: 1,
             message: "Please place your bet.",
-            wait: 5000
+            wait: 0
         },
 
         dealingFirstTwoCards: {
@@ -156,7 +156,7 @@ module.exports = {
             insuranceRequest: function() {},
             hideDealerCard: 1,
             message: "Checking for dealer blackjack.",
-            wait: 3000 //4000
+            wait: 1000 //4000
         },
         checkingForPlayerBlackJack: {
             beginState: function() { 
