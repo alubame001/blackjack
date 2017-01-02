@@ -3,7 +3,7 @@ var option = {simulate:false}
 //var option = {simulate:true}
 
 if (arguments[0]=1) {
-   option.simulate =tue
+   option.simulate =true
 } 
 
 console.log(option)
