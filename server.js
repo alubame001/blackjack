@@ -1,11 +1,11 @@
 var arguments = process.argv.splice(2);
 var option = {simulate:false}
-var option = {simulate:true}
-/*
-if (arguments[0]!=1) {
-   option.simulate =false
+//var option = {simulate:true}
+
+if (arguments[0]=1) {
+   option.simulate =tue
 } 
-*/
+
 console.log(option)
 var express = require('express')
 var  app = express()
