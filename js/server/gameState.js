@@ -60,7 +60,7 @@ module.exports = {
             insuranceRequest: function() {},
             hideDealerCard: 1,
             message: "Please place your bet.",
-            wait: 100
+            wait: 5000
         },
 
         dealingFirstTwoCards: {
